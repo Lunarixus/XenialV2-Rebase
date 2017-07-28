@@ -250,6 +250,18 @@ static void dbs_timer(struct work_struct *work)
 		sampling_rate = od_tuners->sampling_rate;
 	}
 
+	if (!cpufreq_can_do_remote_dvfs(policy_dbs->policy))
+		return;
+
+	/*
+	 * The work may not be allowed to be queued up right now.
+	 * Possible reasons:
+	 * - Work has already been queued up or is in progress.
+	 * - It is too early (too little time from the previous sample).
+	 */
+	if (policy_dbs->work_in_progress)
+		return;
+
 	if (!need_load_eval(cdbs->shared, sampling_rate))
 		modify_all = false;
 
