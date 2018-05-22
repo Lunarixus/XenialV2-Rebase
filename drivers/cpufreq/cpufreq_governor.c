@@ -250,7 +250,7 @@ static void dbs_timer(struct work_struct *work)
 		sampling_rate = od_tuners->sampling_rate;
 	}
 
-	if (!cpufreq_can_do_remote_dvfs(policy_dbs->policy))
+	if (!cpufreq_this_cpu_can_update(policy_dbs->policy))
 		return;
 
 	/*
