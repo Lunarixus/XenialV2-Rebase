@@ -2,10 +2,13 @@
 #include <linux/init.h>
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
+#include <asm/setup.h>
+
+static char new_command_line[COMMAND_LINE_SIZE];
 
 static int cmdline_proc_show(struct seq_file *m, void *v)
 {
-	seq_printf(m, "%s\n", saved_command_line);
+	seq_printf(m, "%s\n", new_command_line);
 	return 0;
 }
 
@@ -21,8 +24,37 @@ static const struct file_operations cmdline_proc_fops = {
 	.release	= single_release,
 };
 
+static void patch_flag(char *cmd, const char *flag, const char *val)
+{
+	size_t flag_len, val_len;
+	char *start, *end;
+
+	start = strstr(cmd, flag);
+	if (!start)
+		return;
+
+	flag_len = strlen(flag);
+	val_len = strlen(val);
+	end = start + flag_len + strcspn(start + flag_len, " ");
+	memmove(start + flag_len + val_len, end, strlen(end) + 1);
+	memcpy(start + flag_len, val, val_len);
+}
+
+static void patch_cmdline_args(char *cmd) {
+        /*
+           Patch specific cmdline arguments to pass safetynet.
+           Replace with actual values to avoid breaking boot.
+	*/
+	patch_flag(cmd, "androidboot.veritymode=", "enforcing");
+	patch_flag(cmd, "androidboot.verifiedbootstate=", "green");
+	patch_flag(cmd, "androidboot.vbmeta.device_state=", "locked");
+}
+
 static int __init proc_cmdline_init(void)
 {
+	strcpy(new_command_line, saved_command_line);
+	patch_cmdline_args(new_command_line);
+
 	proc_create("cmdline", 0, NULL, &cmdline_proc_fops);
 	return 0;
 }
