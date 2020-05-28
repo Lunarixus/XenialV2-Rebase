@@ -1384,8 +1384,6 @@ static int _execute_reg_sequence(struct adreno_device *adreno_dev,
 			udelay(cur[1]);
 			cur += 2;
 			break;
-		default:
-			return -EINVAL;
 	} }
 	return 0;
 }
