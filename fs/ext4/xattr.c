@@ -948,8 +948,8 @@ inserted:
 				if (ref >= EXT4_XATTR_REFCOUNT_MAX)
 					ce->e_reusable = 0;
 				ea_bdebug(new_bh, "reusing; refcount now=%d",
+					le32_to_cpu(BHDR(new_bh)->h_refcount));
 				ext4_xattr_block_csum_set(inode, new_bh);
-					  ref);
 				unlock_buffer(new_bh);
 				error = ext4_handle_dirty_xattr_block(handle,
 								      inode,
