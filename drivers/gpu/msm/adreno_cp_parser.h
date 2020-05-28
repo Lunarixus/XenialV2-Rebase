@@ -152,9 +152,6 @@ static inline int adreno_cp_parser_regindex(struct adreno_device *adreno_dev,
 				enum adreno_cp_addr_regs start,
 				enum adreno_cp_addr_regs end)
 {
-	int i;
-	const unsigned int *regs;
-
 	return -EEXIST;
 }
 
